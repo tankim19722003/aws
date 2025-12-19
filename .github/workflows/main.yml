@@ -25,9 +25,6 @@ jobs:
       # 3. Build file JAR (Bỏ qua test để build nhanh hơn, tuỳ nhu cầu)
       - name: Build with Maven
         run: ./mvnw clean package -DskipTests
-            chmod +x mvnw
-            ./mvnw clean package -DskipTests
-
 
       # 4. Generate timestamp để tạo tên version duy nhất
       - name: Generate deployment package name
