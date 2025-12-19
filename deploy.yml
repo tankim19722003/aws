@@ -1,0 +1,44 @@
+name: Deploy to AWS Elastic Beanstalk
+
+on:
+  push:
+    branches:
+      - main  # Trigger khi push vào nhánh main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Lấy code từ GitHub về
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+      # 2. Cài đặt Java (Ví dụ Java 17)
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      # 3. Build file JAR (Bỏ qua test để build nhanh hơn, tuỳ nhu cầu)
+      - name: Build with Maven
+        run: ./mvnw clean package -DskipTests
+
+      # 4. Generate timestamp để tạo tên version duy nhất
+      - name: Generate deployment package name
+        id: generate_name
+        run: echo "VERSION_LABEL=$(date +'%Y%m%d%H%M%S')" >> $GITHUB_ENV
+
+      # 5. Deploy lên Elastic Beanstalk
+      - name: Deploy to EB
+        uses: einaregilsson/beanstalk-deploy@v21
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: spring-boot-web
+          environment_name: Spring-boot-web-env
+          version_label: "ver-${{ env.VERSION_LABEL }}"
+          region: ap-southeast-1
+          deployment_package: target/*.jar
