@@ -26,7 +26,6 @@ jobs:
       - name: Build with Maven
         run: ./mvnw clean package -DskipTests
             chmod +x mvnw
-            ./mvnw clean package -DskipTests
 
 
       # 4. Generate timestamp để tạo tên version duy nhất
